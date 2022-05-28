@@ -2,11 +2,22 @@
 
 namespace Demo.Containers.Products.Api.Shared;
 
-public class Result<TData>
+public class Result<TData> where TData : class
 {
-    public string ErrorCode { get; set; }
-    public ValidationResult ValidationResult { get; set; }
-    public TData Data { get; set; }
+    private Result(string errorCode, ValidationResult validationResult)
+    {
+        ErrorCode = errorCode;
+        ValidationResult = validationResult;
+    }
+
+    private Result(TData data)
+    {
+        Data = data;
+    }
+
+    public string ErrorCode { get; } = string.Empty;
+    public ValidationResult ValidationResult { get; } = new();
+    public TData? Data { get; }
 
     public bool Status => string.IsNullOrEmpty(ErrorCode);
 
@@ -21,18 +32,11 @@ public class Result<TData>
 
     public static Result<TData> Failure(string errorCode, ValidationResult validationResult)
     {
-        return new Result<TData>
-        {
-            ErrorCode = errorCode,
-            ValidationResult = validationResult
-        };
+        return new Result<TData>(errorCode, validationResult);
     }
 
     public static Result<TData> Success(TData data)
     {
-        return new Result<TData>
-        {
-            Data = data
-        };
+        return new Result<TData>(data);
     }
 }

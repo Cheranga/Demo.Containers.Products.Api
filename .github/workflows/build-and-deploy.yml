@@ -1,0 +1,43 @@
+name: "Demo.Containers"
+concurrency: "Demo.Containers"
+env: 
+  DOTNET_VERSION: 6.0.x
+  PUBLISHED_PATH: ./published
+  
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    
+jobs: 
+  build:
+    name: Build and Deploy
+    runs-on: windows-latest    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          
+      - name: Restore projects
+        run: dotnet restore
+      
+      - name: Build Projects
+        run: dotnet build --no-restore -c Release
+      
+      - name: Publish
+        run: dotnet publish -c Release --no-build -o ${{ env.PUBLISHED_PATH }}/api
+        
+      - name: Publish Artifact - API
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: api
+          path: ${{ env.PUBLISHED_PATH }}
+

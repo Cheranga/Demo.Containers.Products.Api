@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using Demo.Containers.Products.Api.Extensions;
+﻿using Demo.Containers.Products.Api.Extensions;
 using Demo.Containers.Products.Api.Features.GetProductById;
 using Demo.Containers.Products.Api.Infrastructure.DataAccess;
 using Demo.Containers.Products.Api.Shared;
