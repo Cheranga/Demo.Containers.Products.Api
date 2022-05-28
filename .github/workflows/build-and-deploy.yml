@@ -45,6 +45,7 @@ jobs:
           path: ${{ env.PUBLISHED_PATH }}
           
   deploy-staging:
+    name: Deploy to Staging
     needs: build
     runs-on: ubuntu-latest
     
@@ -68,4 +69,15 @@ jobs:
               az group create --name ${{ env.RG_NAME }} --location ${{ env.RG_LOCATION }}
               echo "Azure resource group created"
             fi
-
+            
+      - name: Provision Resources 
+        uses: azure/arm-deploy@v1
+        with:
+          failOnStdErr: false
+          deploymentName: ProductsAPI
+          resourceGroupName: ${{ env.RG_NAME }}
+          template: ./templates/main.bicep
+          parameters: >
+            envName=dev
+            apiName=${{ env.APP_NAME }}
+            location=${{ env.RG_LOCATION }}
