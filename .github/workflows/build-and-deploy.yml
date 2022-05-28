@@ -1,6 +1,9 @@
 name: "Demo.Containers"
 concurrency: "Demo.Containers"
 env: 
+  APP_NAME: cherademoproductsapi
+  RG_NAME: rg-chera-demo
+  RG_LOCATION: Australia Southeast
   DOTNET_VERSION: 6.0.x
   PUBLISHED_PATH: ./published
   
@@ -40,4 +43,29 @@ jobs:
         with:
           name: api
           path: ${{ env.PUBLISHED_PATH }}
+          
+  deploy-staging:
+    needs: build
+    runs-on: windows-latest
+    
+    environment: 
+      name: PRE-PROD
+      
+    steps:
+      - name: Login to Azure CLI
+        uses: azure/login@v1
+        with: 
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Create Resource Group ${{ env.RG_NAME }}
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            #!/bin/bash            
+            if $(az group exists --name ${{ env.RG_NAME }}) ; then
+              echo "Azure resource group already exists, skipping creation..."
+            else
+              az group create --name ${{ env.RG_NAME }} --location ${{ env.RG_LOCATION }}
+              echo "Azure resource group created"
+            fi
 
