@@ -1,0 +1,5 @@
+###
+# @name=getproductbyid
+GET https://localhost:7123/api/products/1
+correlationId: "666"
+Content-Type: application/json
