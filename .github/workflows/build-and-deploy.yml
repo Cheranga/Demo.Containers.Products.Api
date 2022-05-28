@@ -3,7 +3,7 @@ concurrency: "Demo.Containers"
 env: 
   APP_NAME: cherademoproductsapi
   RG_NAME: rg-chera-demo
-  RG_LOCATION: Australia Southeast
+  RG_LOCATION: australiasoutheast
   DOTNET_VERSION: 6.0.x
   PUBLISHED_PATH: ./published
   
