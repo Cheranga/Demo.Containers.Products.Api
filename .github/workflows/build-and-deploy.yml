@@ -1,8 +1,8 @@
 name: "Demo.Containers"
 concurrency: "Demo.Containers"
 env: 
-  DOTNET_VERSION: 6.0.X
-  PUBLISHED_PATH: ./published
+  DOTNET_VERSION: "6.0.X"
+  PUBLISHED_PATH: "./published"
   
 
 on:
