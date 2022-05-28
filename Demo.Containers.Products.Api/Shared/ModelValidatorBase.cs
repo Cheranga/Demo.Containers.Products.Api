@@ -7,7 +7,7 @@ public abstract class ModelValidatorBase<T> : AbstractValidator<T>
 {
     protected ModelValidatorBase()
     {
-        CascadeMode = CascadeMode.Stop;
+        ClassLevelCascadeMode = CascadeMode.Stop;
     }
 
     protected override bool PreValidate(ValidationContext<T> context, ValidationResult result)

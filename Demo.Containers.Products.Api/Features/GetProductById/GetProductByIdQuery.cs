@@ -7,7 +7,13 @@ namespace Demo.Containers.Products.Api.Features.GetProductById;
 
 public class GetProductByIdQuery : IValidatable, IQuery, IRequest<Result<ProductDataModel>>
 {
-    public string ProductId { get; set; }
+    public GetProductByIdQuery(string correlationId, string productId)
+    {
+        CorrelationId = correlationId;
+        ProductId = productId;
+    }
+
+    public string ProductId { get; }
     public string CorrelationId { get; set; }
 }
 

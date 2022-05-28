@@ -4,7 +4,8 @@ namespace Demo.Containers.Products.Api.Features.GetWeather;
 
 public class GetWeatherController : ControllerBase
 {
-    private static readonly string[] Summaries = {
+    private static readonly string[] Summaries =
+    {
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
     };
 
@@ -19,7 +20,7 @@ public class GetWeatherController : ControllerBase
     public IActionResult Get()
     {
         _logger.LogInformation("getting weather report");
-        
+
         var weatherResults = Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),

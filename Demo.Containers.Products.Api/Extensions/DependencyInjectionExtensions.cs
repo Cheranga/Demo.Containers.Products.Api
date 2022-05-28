@@ -5,7 +5,9 @@ namespace Demo.Containers.Products.Api.Extensions;
 
 public static class DependencyInjectionExtensions
 {
-    public static void RegisterBehaviours<TInput, TOutput>(this IServiceCollection services, ServiceLifetime lifeTime= ServiceLifetime.Transient) where TInput: IValidatable, IRequest<Result<TOutput>>
+    public static void RegisterBehaviours<TInput, TOutput>(this IServiceCollection services, ServiceLifetime lifeTime = ServiceLifetime.Transient)
+        where TInput : IValidatable, IRequest<Result<TOutput>>
+        where TOutput : class
     {
         services.AddTransient<IPipelineBehavior<TInput, Result<TOutput>>, PerformanceBehaviour<TInput, TOutput>>();
         services.AddTransient<IPipelineBehavior<TInput, Result<TOutput>>, ValidationBehaviour<TInput, TOutput>>();

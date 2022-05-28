@@ -39,15 +39,13 @@ public class GetProductByIdRequestHandler : IRequestHandler<GetProductByIdReques
 
     public async Task<Result<GetProductByIdResponse>> Handle(GetProductByIdRequest request, CancellationToken cancellationToken)
     {
-        var getProductByIdOperation = await _mediator.Send(new GetProductByIdQuery
-        {
-            CorrelationId = request.CorrelationId,
-            ProductId = request.ProductId
-        }, cancellationToken);
+        var query = new GetProductByIdQuery(request.CorrelationId, request.ProductId);
+        var getProductByIdOperation = await _mediator.Send(query, cancellationToken);
 
         if (!getProductByIdOperation.Status) return Result<GetProductByIdResponse>.Failure(getProductByIdOperation.ErrorCode, getProductByIdOperation.ValidationResult);
 
         var product = getProductByIdOperation.Data;
+        if (product == null) return Result<GetProductByIdResponse>.Failure(ErrorCodes.ProductNotFound, ErrorMessages.ProductNotFound);
 
         var response = new GetProductByIdResponse
         {

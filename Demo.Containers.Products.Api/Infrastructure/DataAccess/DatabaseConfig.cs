@@ -2,5 +2,5 @@
 
 public class DatabaseConfig
 {
-    public string ServerName { get; set; }
+    public string? ServerName { get; set; }
 }

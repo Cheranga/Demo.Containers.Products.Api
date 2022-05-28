@@ -6,9 +6,9 @@ namespace Demo.Containers.Products.Api.Features.GetProductById;
 
 public class GetProductByIdResponse
 {
-    public string Id { get; set; }
-    public string Category { get; set; }
-    public string Name { get; set; }
+    public string? Id { get; set; }
+    public string? Category { get; set; }
+    public string? Name { get; set; }
     public decimal Price { get; set; }
 }
 

@@ -1,8 +1,4 @@
 using Demo.Containers.Products.Api;
-using Demo.Containers.Products.Api.Features.GetProductById;
-using Demo.Containers.Products.Api.Shared;
-using FluentValidation;
-using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
 
