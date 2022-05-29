@@ -140,7 +140,7 @@ jobs:
       
       - name: Stop Staging Slot
         run: |
-          az resource invoke-action --action stop --ids  /subscriptions/{{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}/providers/Microsoft.Web/sites/api-${{ env.APP_NAME }}-dev/slots/staging
+          az resource invoke-action --action stop --ids  /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}/providers/Microsoft.Web/sites/api-${{ env.APP_NAME }}-dev/slots/staging
 
       - name: az cli logout
         run: az logout          
