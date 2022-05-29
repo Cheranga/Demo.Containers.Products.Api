@@ -19,15 +19,7 @@ resource apiName_resource 'Microsoft.Web/sites@2019-08-01' = {
         thumbprint: null
         toUpdate: null
         hostType: 'Standard'
-      }
-      {
-        name: fullWebAppUriForStagingSlot
-        sslState: 'Disabled'
-        virtualIP: null
-        thumbprint: null
-        toUpdate: null
-        hostType: 'Repository'
-      }
+      }      
     ]
     siteConfig: {
       minTlsVersion: '1.2'

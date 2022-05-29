@@ -31,7 +31,7 @@ module productAPI 'api/template.bicep' = {
   name: '${apiName}-${envName}'
   params: {
     location: location
-    apiEnvironment: apiEnvironmentName
+    apiEnvironment: apiEnvironment
     apiName: productsApiName    
     planName: aspName
   }
