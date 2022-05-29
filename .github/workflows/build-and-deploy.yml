@@ -1,8 +1,12 @@
 name: "Demo.Containers"
 concurrency: "Demo.Containers"
 env: 
+  APP_NAME: cherademoproductsapi
+  RG_NAME: rg-chera-demo
+  RG_LOCATION: australiasoutheast
   DOTNET_VERSION: 6.0.x
   PUBLISHED_PATH: ./published
+#  BUILD_NUMBER: "$(date +'%Y-%m-%d')"
   
 
 on:
@@ -33,11 +37,142 @@ jobs:
         run: dotnet build --no-restore -c Release
       
       - name: Publish
-        run: dotnet publish -c Release --no-build -o ${{ env.PUBLISHED_PATH }}/api
+        run: dotnet publish -c Release --no-build Demo.Containers.Products.Api/Demo.Containers.Products.Api.csproj -o api
         
       - name: Publish Artifact - API
-        uses: actions/upload-artifact@v1.0.0
+        uses: actions/upload-artifact@v3
         with:
           name: api
-          path: ${{ env.PUBLISHED_PATH }}
+          path: api/**
+          if-no-files-found: error
+          
+      - name: Publish Artifact - Templates
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy
+          path: ./.github/templates
+          if-no-files-found: error
+          
+  deploy-staging:
+    name: PRE-PROD
+    needs: build
+    runs-on: ubuntu-latest
+    
+    environment: 
+      name: PRE-PROD
+      url: ${{ steps.deploywebapp.outputs.webapp-url }}
+      
+    steps:
+      - name: Login to Azure CLI
+        uses: azure/login@v1
+        with: 
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Create Resource Group ${{ env.RG_NAME }}
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            #!/bin/bash            
+            if $(az group exists --name ${{ env.RG_NAME }}) ; then
+              echo "Azure resource group already exists, skipping creation..."
+            else
+              az group create --name ${{ env.RG_NAME }} --location ${{ env.RG_LOCATION }}
+              echo "Azure resource group created"
+            fi
 
+      - name: Download API
+        uses: actions/download-artifact@v3
+        with:
+          name: api
+          path: api
+          
+      - name: Download Templates
+        uses: actions/download-artifact@v3
+        with:
+          name: deploy
+          path: deploy
+            
+      - name: Provision Resources 
+        uses: azure/arm-deploy@v1
+        with:
+          failOnStdErr: false
+          deploymentName: ProductsAPI
+          resourceGroupName: ${{ env.RG_NAME }}
+          template: deploy/main.bicep
+          parameters: >            
+            envName=dev
+            apiEnvironment=Development
+            apiName=${{ env.APP_NAME }}
+            location=${{ env.RG_LOCATION }}
+            
+      - name: Start Staging Slot
+        run: |
+          az resource invoke-action --action start --ids  /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}/providers/Microsoft.Web/sites/api-${{ env.APP_NAME }}-dev/slots/staging            
+      
+      - name: Deploy web app
+        id: deploywebapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: api-${{ env.APP_NAME }}-dev
+          slot-name: staging
+          package: api 
+          
+      - name: Update config
+        uses: Azure/appservice-settings@v1
+        with:
+          app-name: api-${{ env.APP_NAME }}-dev
+          slot-name: staging
+          app-settings-json: |
+            [
+                {
+                    "name": "DatabaseConfig:ConnectionString",
+                    "value": "${{ secrets.DATABASECONNECTIONSTRING }}",
+                    "slotSetting": true
+                }
+            ]
+      
+      - name: az cli logout
+        run: az logout  
+          
+  deploy_prod:
+    name: PROD
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+
+    environment:
+      name: PROD
+      url: ${{ steps.slot_swap.outputs.url }}
+
+    steps:
+      - name: Login via Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Swap staging slot into production
+        id: slot_swap
+        run: |
+          az webapp deployment slot swap -g ${{ env.RG_NAME }} -n api-${{ env.APP_NAME }}-dev -s staging
+          url=$(az webapp show -g ${{ env.RG_NAME }} -n api-${{ env.APP_NAME }}-dev --query "defaultHostName" -o tsv)
+          echo "::set-output name=url::https://$url"
+          
+      - name: Update config
+        uses: Azure/appservice-settings@v1
+        with:
+          app-name: api-${{ env.APP_NAME }}-dev
+          app-settings-json: |
+            [
+                {
+                    "name": "DatabaseConfig:ConnectionString",
+                    "value": "${{ secrets.DATABASECONNECTIONSTRING }}",
+                    "slotSetting": true
+                }
+            ]          
+      
+      - name: Stop Staging Slot
+        run: |
+          az resource invoke-action --action stop --ids  /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}/providers/Microsoft.Web/sites/api-${{ env.APP_NAME }}-dev/slots/staging
+
+      - name: az cli logout
+        run: az logout          
+            
