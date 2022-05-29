@@ -117,7 +117,7 @@ jobs:
         run: az logout  
           
   deploy_prod:
-    needs: deploy_staging
+    needs: deploy-staging
     runs-on: ubuntu-latest
 
     environment:
