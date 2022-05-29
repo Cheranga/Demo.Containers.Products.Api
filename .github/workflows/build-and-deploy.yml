@@ -92,7 +92,7 @@ jobs:
           resourceGroupName: ${{ env.RG_NAME }}
           template: ./.github/templates/main.bicep
           parameters: >
-            buildNumber=$(date +'%Y-%m-%d')
+            buildNumber=${{ github.event.repository.updated_at}}
             envName=dev
             apiName=${{ env.APP_NAME }}
             location=${{ env.RG_LOCATION }}
