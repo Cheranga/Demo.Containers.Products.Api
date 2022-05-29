@@ -83,16 +83,16 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: api
-          path: Demo.Containers.Products.Api/api
+          path: api
           
       - name: Download Templates
         uses: actions/download-artifact@v3
         with:
           name: deploy
-          path: Demo.Containers.Products.Api/deploy
+          path: deploy
 
-      - name: Checkout
-        uses: actions/checkout@v2          
+#      - name: Checkout
+#        uses: actions/checkout@v2          
             
       - name: Provision Resources 
         uses: azure/arm-deploy@v1
@@ -100,7 +100,7 @@ jobs:
           failOnStdErr: false
           deploymentName: ProductsAPI
           resourceGroupName: ${{ env.RG_NAME }}
-          template: ./.github/templates/main.bicep
+          template: deploy/templates/main.bicep
           parameters: >            
             envName=dev
             apiEnvironment=Development
