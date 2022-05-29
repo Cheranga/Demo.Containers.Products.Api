@@ -90,9 +90,6 @@ jobs:
         with:
           name: deploy
           path: deploy
-
-#      - name: Checkout
-#        uses: actions/checkout@v2          
             
       - name: Provision Resources 
         uses: azure/arm-deploy@v1
@@ -107,11 +104,11 @@ jobs:
             apiName=${{ env.APP_NAME }}
             location=${{ env.RG_LOCATION }}
       
-#      - name: Deploy web app
-#        id: deploywebapp
-#        uses: azure/webapps-deploy@v2
-#        with:
-#          app-name: api-${{ env.APP_NAME }}-dev
-#          slot-name: staging
-#          package: api            
+      - name: Deploy web app
+        id: deploywebapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: api-${{ env.APP_NAME }}-dev
+          slot-name: staging
+          package: api            
             
