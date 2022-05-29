@@ -37,19 +37,21 @@ jobs:
         run: dotnet build --no-restore -c Release
       
       - name: Publish
-        run: dotnet publish -c Release --no-build -o ${{ env.PUBLISHED_PATH }}/api
+        run: dotnet publish -c Release --no-build Demo.Containers.Products.Api/Demo.Containers.Products.Api.csproj -o api
         
       - name: Publish Artifact - API
         uses: actions/upload-artifact@v3
         with:
           name: api
-          path: ${{ env.PUBLISHED_PATH }}
+          path: Demo.Containers.Products.Api/api/**
+          if-no-files-found: error
           
       - name: Publish Artifact - Templates
         uses: actions/upload-artifact@v3
         with:
           name: deploy
-          path: ./.github/templates          
+          path: ./.github/templates
+          if-no-files-found: error
           
   deploy-staging:
     name: Deploy to Staging
@@ -81,13 +83,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: api
-          path: api
+          path: Demo.Containers.Products.Api/api
           
       - name: Download Templates
         uses: actions/download-artifact@v3
         with:
           name: deploy
-          path: deploy
+          path: Demo.Containers.Products.Api/deploy
 
       - name: Checkout
         uses: actions/checkout@v2          
@@ -105,11 +107,11 @@ jobs:
             apiName=${{ env.APP_NAME }}
             location=${{ env.RG_LOCATION }}
       
-      - name: Deploy web app
-        id: deploywebapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: api-${{ env.APP_NAME }}-dev
-          slot-name: staging
-          package: api            
+#      - name: Deploy web app
+#        id: deploywebapp
+#        uses: azure/webapps-deploy@v2
+#        with:
+#          app-name: api-${{ env.APP_NAME }}-dev
+#          slot-name: staging
+#          package: api            
             
