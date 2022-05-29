@@ -115,8 +115,22 @@ jobs:
         with:
           app-name: api-${{ env.APP_NAME }}-dev
           slot-name: staging
-          package: api     
-            
+          package: api 
+          
+      - name: Update config
+        uses: Azure/appservice-settings@v1
+        with:
+          app-name: api-${{ env.APP_NAME }}-dev
+          slot-name: staging
+          app-settings-json: |
+            [
+                {
+                    "name": "DatabaseConfig:ConnectionString",
+                    "value": "${{ secrets.DATABASECONNECTIONSTRING }}",
+                    "slotSetting": true
+                }
+            ]
+      
       - name: az cli logout
         run: az logout  
           
@@ -141,6 +155,19 @@ jobs:
           az webapp deployment slot swap -g ${{ env.RG_NAME }} -n api-${{ env.APP_NAME }}-dev -s staging
           url=$(az webapp show -g ${{ env.RG_NAME }} -n api-${{ env.APP_NAME }}-dev --query "defaultHostName" -o tsv)
           echo "::set-output name=url::https://$url"
+          
+      - name: Update config
+        uses: Azure/appservice-settings@v1
+        with:
+          app-name: api-${{ env.APP_NAME }}-dev
+          app-settings-json: |
+            [
+                {
+                    "name": "DatabaseConfig:ConnectionString",
+                    "value": "${{ secrets.DATABASECONNECTIONSTRING }}",
+                    "slotSetting": true
+                }
+            ]          
       
       - name: Stop Staging Slot
         run: |
