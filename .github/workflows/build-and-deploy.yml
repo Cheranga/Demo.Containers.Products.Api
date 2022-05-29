@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: api
-          path: Demo.Containers.Products.Api/api/**
+          path: api/**
           if-no-files-found: error
           
       - name: Publish Artifact - Templates
