@@ -100,7 +100,7 @@ jobs:
           failOnStdErr: false
           deploymentName: ProductsAPI
           resourceGroupName: ${{ env.RG_NAME }}
-          template: deploy/templates/main.bicep
+          template: deploy/main.bicep
           parameters: >            
             envName=dev
             apiEnvironment=Development
