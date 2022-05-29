@@ -1,4 +1,4 @@
-![workflow](https://github.com/Cheranga/Demo.Containers.Products.Api/workflows/build-and-deploy.yml/badge.svg)
+[![Demo.Containers](https://github.com/Cheranga/Demo.Containers.Products.Api/actions/workflows/build-and-deploy.yml/badge.svg)](https://github.com/Cheranga/Demo.Containers.Products.Api/actions/workflows/build-and-deploy.yml)
 # Demo.Containers.Products.Api
 
 ## Introduction
