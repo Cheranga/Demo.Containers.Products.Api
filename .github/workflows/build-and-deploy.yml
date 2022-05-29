@@ -54,7 +54,7 @@ jobs:
           if-no-files-found: error
           
   deploy-staging:
-    name: Deploy to Staging
+    name: PRE-PROD
     needs: build
     runs-on: ubuntu-latest
     
@@ -117,6 +117,7 @@ jobs:
         run: az logout  
           
   deploy_prod:
+    name: PROD
     needs: deploy-staging
     runs-on: ubuntu-latest
 
@@ -136,6 +137,10 @@ jobs:
           az webapp deployment slot swap -g ${{ env.RG_NAME }} -n api-${{ env.APP_NAME }}-dev -s staging
           url=$(az webapp show -g ${{ env.RG_NAME }} -n api-${{ env.APP_NAME }}-dev --query "defaultHostName" -o tsv)
           echo "::set-output name=url::https://$url"
+      
+      - name: Stop Staging Slot
+        run: |
+          az resource invoke-action --action stop --ids  /subscriptions/{{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}/providers/Microsoft.Web/sites/api-${{ env.APP_NAME }}-dev/slots/staging
 
       - name: az cli logout
         run: az logout          
