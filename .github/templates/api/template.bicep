@@ -4,6 +4,7 @@ param location string = resourceGroup().location
 param planName string
 
 var fullWebAppUriForProductionSlot = '${apiName}.azurewebsites.net'
+var fullWebAppUriForStagingSlot = '${apiName}.scm.azurewebsites.net'
 var websiteTimeZone = 'AUS Eastern Standard Time'
 
 resource apiName_resource 'Microsoft.Web/sites@2019-08-01' = {
@@ -19,7 +20,15 @@ resource apiName_resource 'Microsoft.Web/sites@2019-08-01' = {
         thumbprint: null
         toUpdate: null
         hostType: 'Standard'
-      }      
+      }
+      {
+        name: fullWebAppUriForStagingSlot
+        sslState: 'Disabled'
+        virtualIP: null
+        thumbprint: null
+        toUpdate: null
+        hostType: 'Repository'
+      }     
     ]
     siteConfig: {
       minTlsVersion: '1.2'
@@ -49,4 +58,39 @@ resource apiName_appsettings 'Microsoft.Web/sites/config@2019-08-01' = {
   }
 }
 
+resource apiName_Staging 'Microsoft.Web/sites/slots@2019-08-01' = {
+  parent: apiName_resource
+  kind: 'app'
+  name: 'Staging'
+  location: location
+  properties: {
+    enabled: true
+    serverFarmId: '/subscriptions/${subscription().id}/resourcegroups/${resourceGroup().name}/providers/Microsoft.Web/serverfarms/${planName}'
+    reserved: false
+    scmSiteAlsoStopped: false
+    hostingEnvironmentProfile: null
+    clientAffinityEnabled: false
+    clientCertEnabled: false
+    hostNamesDisabled: false
+    containerSize: 0
+    dailyMemoryTimeQuota: 0
+    cloningInfo: null
+  }
+  identity: {
+    type: 'SystemAssigned'
+  }
+}
+
+resource apiName_Staging_appsettings 'Microsoft.Web/sites/slots/config@2019-08-01' = {
+  parent: apiName_Staging
+  name: 'appsettings'
+  properties: {    
+    ASPNETCORE_ENVIRONMENT: apiEnvironment
+    DIAGNOSTICS_AZUREBLOBCONTAINERSASURL: ''
+    DIAGNOSTICS_AZUREBLOBRETENTIONINDAYS: '90'
+    WEBSITE_TIME_ZONE: websiteTimeZone
+  }
+}
+
 output ProductionObjectId string = apiName_resource.identity.principalId
+output StagingObjectId string = apiName_Staging.identity.principalId
