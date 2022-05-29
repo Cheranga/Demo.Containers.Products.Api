@@ -39,10 +39,16 @@ jobs:
         run: dotnet publish -c Release --no-build -o ${{ env.PUBLISHED_PATH }}/api
         
       - name: Publish Artifact - API
-        uses: actions/upload-artifact@v1.0.0
+        uses: actions/upload-artifact@v3
         with:
           name: api
           path: ${{ env.PUBLISHED_PATH }}
+          
+      - name: Publish Artifact - Templates
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy
+          path: ${{ env.PUBLISHED_PATH }}          
           
   deploy-staging:
     name: Deploy to Staging
@@ -70,14 +76,14 @@ jobs:
               echo "Azure resource group created"
             fi
             
-      - name: Provision Resources 
-        uses: azure/arm-deploy@v1
-        with:
-          failOnStdErr: false
-          deploymentName: ProductsAPI
-          resourceGroupName: ${{ env.RG_NAME }}
-          template: ./.github/templates/main.bicep
-          parameters: >
-            envName=dev
-            apiName=${{ env.APP_NAME }}
-            location=${{ env.RG_LOCATION }}
+#      - name: Provision Resources 
+#        uses: azure/arm-deploy@v1
+#        with:
+#          failOnStdErr: false
+#          deploymentName: ProductsAPI
+#          resourceGroupName: ${{ env.RG_NAME }}
+#          template: ./.github/templates/main.bicep
+#          parameters: >
+#            envName=dev
+#            apiName=${{ env.APP_NAME }}
+#            location=${{ env.RG_LOCATION }}
