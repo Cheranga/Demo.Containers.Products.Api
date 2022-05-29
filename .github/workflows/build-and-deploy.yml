@@ -6,7 +6,7 @@ env:
   RG_LOCATION: australiasoutheast
   DOTNET_VERSION: 6.0.x
   PUBLISHED_PATH: ./published
-  BUILD_NUMBER: $(date +'%Y-%m-%d')
+#  BUILD_NUMBER: "$(date +'%Y-%m-%d')"
   
 
 on:
@@ -92,9 +92,9 @@ jobs:
           deploymentName: ProductsAPI
           resourceGroupName: ${{ env.RG_NAME }}
           template: ./.github/templates/main.bicep
-          parameters: >
-            buildNumber=${{ env.BUILD_NUMBER }}
+          parameters: >            
             envName=dev
+            apiEnvironment=Development
             apiName=${{ env.APP_NAME }}
             location=${{ env.RG_LOCATION }}
             
