@@ -76,7 +76,7 @@ jobs:
           failOnStdErr: false
           deploymentName: ProductsAPI
           resourceGroupName: ${{ env.RG_NAME }}
-          template: ./.github/templates/main.bicep
+          template: ./templates/main.bicep
           parameters: >
             envName=dev
             apiName=${{ env.APP_NAME }}
