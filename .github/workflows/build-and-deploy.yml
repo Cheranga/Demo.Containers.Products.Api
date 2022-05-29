@@ -81,11 +81,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: api
+          path: api
           
       - name: Download Templates
         uses: actions/download-artifact@v3
         with:
-          name: deploy     
+          name: deploy
+          path: deploy
 
       - name: Checkout
         uses: actions/checkout@v2          
