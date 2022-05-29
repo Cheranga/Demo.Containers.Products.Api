@@ -104,6 +104,10 @@ jobs:
             apiEnvironment=Development
             apiName=${{ env.APP_NAME }}
             location=${{ env.RG_LOCATION }}
+            
+      - name: Start Staging Slot
+        run: |
+          az resource invoke-action --action start --ids  /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}/providers/Microsoft.Web/sites/api-${{ env.APP_NAME }}-dev/slots/staging            
       
       - name: Deploy web app
         id: deploywebapp
