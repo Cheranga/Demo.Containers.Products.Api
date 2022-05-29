@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: deploy
-          path: ./github/templates          
+          path: ./.github/templates          
           
   deploy-staging:
     name: Deploy to Staging
