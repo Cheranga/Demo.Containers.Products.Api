@@ -3,8 +3,7 @@ using Demo.Containers.Products.Api.Features.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// register dependencies
 Bootstrapper.RegisterServices(builder.Services, builder.Configuration);
 
 builder.Services.AddControllers();

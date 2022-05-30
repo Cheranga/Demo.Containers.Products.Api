@@ -3,7 +3,7 @@ using Demo.Containers.Products.Api.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Demo.Containers.Products.Api.Features.GetProductById;
+namespace Demo.Containers.Products.Api.Features.GetProductById.V1;
 
 public class GetProductByIdController : ControllerBase
 {
@@ -16,7 +16,7 @@ public class GetProductByIdController : ControllerBase
         _responseGenerator = responseGenerator;
     }
 
-    [HttpGet("api/products/{productId}")]
+    [HttpGet("api/v1/products/{productId}")]
     public async Task<IActionResult> GetProductById([FromHeader] [Required] string correlationId, [FromRoute] string productId)
     {
         var getProductByIdRequest = new GetProductByIdRequest(correlationId, productId);
