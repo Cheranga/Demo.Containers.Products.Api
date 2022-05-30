@@ -1,0 +1,11 @@
+version: '3.4'
+services: 
+  productsapi:
+    build:
+      dockerfile: Demo.Containers.Products.Api/Dockerfile
+    environment: 
+      DatabaseConfig:ConnectionString: "connectionstring_from_pipeline"
+    volumes:
+      - ${APPDATA}\AppData\Roaming\microsoft\UserSecrets\:/root/.microsoft/usersecrets
+    ports:
+      - "8080:80"

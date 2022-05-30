@@ -21,8 +21,11 @@ public class Bootstrapper
 
     private static void RegisterConfigurations(IServiceCollection services, ConfigurationManager configurationManager)
     {
-        var databaseConfig = configurationManager.GetSection(nameof(DatabaseConfig)).Get<DatabaseConfig>();
-        services.AddSingleton(databaseConfig);
+        var connectionString = configurationManager["DatabaseConfig:ConnectionString"] ?? "";
+        services.AddSingleton(new DatabaseConfig
+        {
+            ConnectionString = connectionString
+        });
     }
 
     private static void RegisterBehaviours(IServiceCollection services)
