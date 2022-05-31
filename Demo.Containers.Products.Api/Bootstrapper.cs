@@ -12,40 +12,32 @@ namespace Demo.Containers.Products.Api;
 
 public class Bootstrapper
 {
-    public static void RegisterServices(IServiceCollection services, ConfigurationManager configurationManager)
+    public static void RegisterServices(WebApplicationBuilder builder, ConfigurationManager configurationManager)
     {
+        var services = builder.Services;
+
         services.AddMediatR(typeof(Bootstrapper).Assembly);
         services.AddValidatorsFromAssembly(typeof(ModelValidatorBase<>).Assembly);
 
         RegisterConfigurations(services, configurationManager);
         RegisterResponseGenerators(services);
         RegisterBehaviours(services);
-        RegisterLogging(services, configurationManager);
+        RegisterLogging(builder);
     }
 
-    private static void RegisterLogging(IServiceCollection services, ConfigurationManager configurationManager)
+    private static void RegisterLogging(WebApplicationBuilder builder)
     {
-        services.AddLogging(builder =>
+        builder.Host.UseSerilog((context, configuration) =>
         {
-            var isLocal = string.Equals(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), "Local", StringComparison.OrdinalIgnoreCase);
-            if (isLocal)
+            if (string.Equals("local", context.HostingEnvironment.EnvironmentName, StringComparison.OrdinalIgnoreCase))
             {
-                var logger = new LoggerConfiguration()
-                    .MinimumLevel.Debug()
-                    .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
-                    .CreateLogger();
-
-                builder.AddSerilog(logger);
+                configuration.MinimumLevel.Debug()
+                    .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}");
             }
             else
             {
-                var logger = new LoggerConfiguration()
-                    .MinimumLevel.Debug()
-                    .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
-                    .WriteTo.ApplicationInsights(TelemetryConfiguration.CreateDefault(), TelemetryConverter.Traces, LogEventLevel.Debug)
-                    .CreateLogger();
-
-                builder.AddSerilog(logger);
+                configuration.MinimumLevel.Debug()
+                    .WriteTo.ApplicationInsights(TelemetryConfiguration.CreateDefault(), TelemetryConverter.Traces, LogEventLevel.Debug);
             }
         });
     }
