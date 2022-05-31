@@ -4,6 +4,9 @@ using Demo.Containers.Products.Api.Infrastructure.DataAccess;
 using Demo.Containers.Products.Api.Shared;
 using FluentValidation;
 using MediatR;
+using Microsoft.ApplicationInsights.Extensibility;
+using Serilog;
+using Serilog.Events;
 
 namespace Demo.Containers.Products.Api;
 
@@ -27,12 +30,22 @@ public class Bootstrapper
             var isLocal = string.Equals(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), "Local", StringComparison.OrdinalIgnoreCase);
             if (isLocal)
             {
-                builder.AddConsole();
+                var logger = new LoggerConfiguration()
+                    .MinimumLevel.Debug()
+                    .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                    .CreateLogger();
+
+                builder.AddSerilog(logger);
             }
             else
             {
-                var instrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
-                services.AddApplicationInsightsTelemetry(instrumentationKey);
+                var logger = new LoggerConfiguration()
+                    .MinimumLevel.Debug()
+                    .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                    .WriteTo.ApplicationInsights(TelemetryConfiguration.CreateDefault(), TelemetryConverter.Traces, LogEventLevel.Debug)
+                    .CreateLogger();
+
+                builder.AddSerilog(logger);
             }
         });
     }
