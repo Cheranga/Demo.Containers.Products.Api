@@ -9,7 +9,7 @@ param databaseConnectionString string
 var appInsName = 'ins-${apiName}-${envName}'
 var aspName = 'plan-${apiName}-${envName}'
 var productsApiName = 'api-${apiName}-${envName}'
-var keyVaultName = 'kv-cc-prod-${apiName}-${envName}'
+var keyVaultName = 'kv-chera-productsapi-${envName}'
 
 // Application insights
 module appInsights 'appinsights/template.bicep' = {
