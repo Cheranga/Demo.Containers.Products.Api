@@ -43,11 +43,16 @@ module keyVault 'keyvault/template.bicep' = {
           name: 'databaseConnectionString'
           value: databaseConnectionString
         }
+        {
+          name: 'appInsightsKey'
+          value: appInsights.outputs.appInsightsKey
+        }
       ]
     }
   }
   dependsOn: [
     productAPI
+    appInsights
   ]
 }
 
