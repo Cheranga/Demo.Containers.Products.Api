@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Demo.Containers.Products.Api.Extensions;
 
-public static class DependencyInjectionExtensions
+public static class BehaviourExtensions
 {
     public static void RegisterBehaviours<TInput, TOutput>(this IServiceCollection services, ServiceLifetime lifeTime = ServiceLifetime.Transient)
         where TInput : IValidatable, IRequest<Result<TOutput>>
