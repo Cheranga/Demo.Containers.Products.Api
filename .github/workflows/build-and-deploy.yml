@@ -104,6 +104,7 @@ jobs:
             apiEnvironment=Development
             apiName=${{ env.APP_NAME }}
             location=${{ env.RG_LOCATION }}
+            databaseConnectionString=${{ secrets.DATABASECONNECTIONSTRING }}
             
       - name: Start Staging Slot
         run: |

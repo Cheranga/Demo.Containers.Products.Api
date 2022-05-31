@@ -3,17 +3,20 @@ param apiEnvironment string
 param apiName string
 param location string = resourceGroup().location
 
+@secure()
+param databaseConnectionString string
+
 var appInsName = 'ins-${apiName}-${envName}'
 var aspName = 'plan-${apiName}-${envName}'
 var productsApiName = 'api-${apiName}-${envName}'
-
+var keyVaultName = 'kv-cc-prod-${apiName}-${envName}'
 
 // Application insights
 module appInsights 'appinsights/template.bicep' = {
   name: 'applicationinsights'
   params: {
     name: appInsName
-    location:location
+    location: location
   }
 }
 
@@ -22,8 +25,30 @@ module appServicePlan 'appserviceplan/template.bicep' = {
   name: 'appserviceplan'
   params: {
     planName: aspName
-    location:location
+    location: location
   }
+}
+
+// Key vault
+module keyVault 'keyvault/template.bicep' = {
+  name: 'keyvault'
+  params: {
+    location: location
+    kvName: keyVaultName
+    productionSlotId: productAPI.outputs.ProductionObjectId
+    stagingSlotId: productAPI.outputs.StagingObjectId
+    secretData: {
+      items: [
+        {
+          name: 'databaseConnectionString'
+          value: databaseConnectionString
+        }
+      ]
+    }
+  }
+  dependsOn: [
+    productAPI
+  ]
 }
 
 // API
@@ -32,10 +57,11 @@ module productAPI 'api/template.bicep' = {
   params: {
     location: location
     apiEnvironment: apiEnvironment
-    apiName: productsApiName    
+    apiName: productsApiName
     planName: aspName
+    keyVaultName: keyVaultName
   }
-  dependsOn:[
+  dependsOn: [
     appInsights
     appServicePlan
   ]
