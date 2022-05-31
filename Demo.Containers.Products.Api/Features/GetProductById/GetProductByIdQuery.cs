@@ -41,7 +41,7 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, R
         return Result<ProductDataModel>.Success(new ProductDataModel
         {
             Id = "1",
-            Category = "Gardening",
+            Category = _databaseConfig.ConnectionString,
             Name = "Showel",
             Price = 35.50m
         });
