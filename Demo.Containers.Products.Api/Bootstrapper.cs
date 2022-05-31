@@ -17,6 +17,24 @@ public class Bootstrapper
         RegisterConfigurations(services, configurationManager);
         RegisterResponseGenerators(services);
         RegisterBehaviours(services);
+        RegisterLogging(services, configurationManager);
+    }
+
+    private static void RegisterLogging(IServiceCollection services, ConfigurationManager configurationManager)
+    {
+        services.AddLogging(builder =>
+        {
+            var isLocal = string.Equals(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), "Local", StringComparison.OrdinalIgnoreCase);
+            if (isLocal)
+            {
+                builder.AddConsole();
+            }
+            else
+            {
+                var instrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
+                services.AddApplicationInsightsTelemetry(instrumentationKey);
+            }
+        });
     }
 
     private static void RegisterConfigurations(IServiceCollection services, ConfigurationManager configurationManager)
