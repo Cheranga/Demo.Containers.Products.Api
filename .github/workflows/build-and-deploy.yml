@@ -62,8 +62,7 @@ jobs:
     
     environment: 
       name: PRE-PROD      
-      url: ${{ steps.deploywebapp.outputs.webapp-url }}
-      
+      url: ${{ steps.deploywebapp.outputs.webapp-url }}      
       
     steps:      
       - name: Create Resource Group ${{ env.RG_NAME }}
