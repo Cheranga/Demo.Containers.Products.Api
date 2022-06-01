@@ -57,28 +57,21 @@ jobs:
     name: Deploy to Staging
     needs: build
     runs-on: ubuntu-latest
+    env:
+      RG_NAME: rg-chera-demo-dev
     
     environment: 
-      name: PRE-PROD
+      name: PRE-PROD      
       url: ${{ steps.deploywebapp.outputs.webapp-url }}
       
-    steps:
-      - name: Login to Azure CLI
-        uses: azure/login@v1
-        with: 
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
       
+    steps:      
       - name: Create Resource Group ${{ env.RG_NAME }}
-        uses: azure/CLI@v1
+        uses: ./.github/actions/createresourcegroup/action.yml
         with:
-          inlineScript: |
-            #!/bin/bash            
-            if $(az group exists --name ${{ env.RG_NAME }}) ; then
-              echo "Azure resource group already exists, skipping creation..."
-            else
-              az group create --name ${{ env.RG_NAME }} --location ${{ env.RG_LOCATION }}
-              echo "Azure resource group created"
-            fi
+          credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          name: ${{ env.RG_NAME }}
+          location: ${{ env.RG_LOCATION }}
 
       - name: Download API
         uses: actions/download-artifact@v3
