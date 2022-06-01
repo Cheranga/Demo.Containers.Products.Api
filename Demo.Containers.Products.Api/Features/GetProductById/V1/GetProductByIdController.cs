@@ -3,7 +3,7 @@ using Demo.Containers.Products.Api.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Demo.Containers.Products.Api.Features.GetProductById;
+namespace Demo.Containers.Products.Api.Features.GetProductById.V1;
 
 public class GetProductByIdController : ControllerBase
 {

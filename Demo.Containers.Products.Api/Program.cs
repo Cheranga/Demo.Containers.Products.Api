@@ -1,11 +1,14 @@
 using Demo.Containers.Products.Api;
 using Demo.Containers.Products.Api.Features.HealthChecks;
+using Microsoft.ApplicationInsights.Extensibility;
+using Serilog;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-Bootstrapper.RegisterServices(builder.Services, builder.Configuration);
+Bootstrapper.RegisterServices(builder, builder.Configuration);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

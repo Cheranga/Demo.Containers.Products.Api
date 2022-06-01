@@ -3,7 +3,7 @@ using Demo.Containers.Products.Api.Shared;
 using FluentValidation;
 using MediatR;
 
-namespace Demo.Containers.Products.Api.Features.GetProductById;
+namespace Demo.Containers.Products.Api.Features.GetProductById.V1;
 
 public class GetProductByIdQuery : IValidatable, IQuery, IRequest<Result<ProductDataModel>>
 {
@@ -41,7 +41,7 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, R
         return Result<ProductDataModel>.Success(new ProductDataModel
         {
             Id = "1",
-            Category = "Gardening",
+            Category = _databaseConfig.ConnectionString,
             Name = "Showel",
             Price = 35.50m
         });

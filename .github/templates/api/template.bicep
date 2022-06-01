@@ -2,10 +2,13 @@ param apiName string
 param apiEnvironment string
 param location string = resourceGroup().location
 param planName string
+param keyVaultName string
 
 var fullWebAppUriForProductionSlot = '${apiName}.azurewebsites.net'
 var fullWebAppUriForStagingSlot = '${apiName}.scm.azurewebsites.net'
 var websiteTimeZone = 'AUS Eastern Standard Time'
+var databaseConnectionString = '@Microsoft.KeyVault(SecretUri=https://${keyVaultName}.vault.azure.net/secrets/databaseConnectionString/)'
+var appInsightsKey = '@Microsoft.KeyVault(SecretUri=https://${keyVaultName}.vault.azure.net/secrets/appInsightsKey/)'
 
 resource apiName_resource 'Microsoft.Web/sites@2019-08-01' = {
   name: apiName
@@ -89,6 +92,8 @@ resource apiName_Staging_appsettings 'Microsoft.Web/sites/slots/config@2019-08-0
     DIAGNOSTICS_AZUREBLOBCONTAINERSASURL: ''
     DIAGNOSTICS_AZUREBLOBRETENTIONINDAYS: '90'
     WEBSITE_TIME_ZONE: websiteTimeZone
+    DatabaseConfig__ConnectionString: databaseConnectionString
+    APPINSIGHTS_INSTRUMENTATIONKEY: appInsightsKey
   }
 }
 

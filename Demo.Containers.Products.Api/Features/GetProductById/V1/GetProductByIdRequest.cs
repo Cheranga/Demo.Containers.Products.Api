@@ -2,7 +2,7 @@
 using FluentValidation;
 using MediatR;
 
-namespace Demo.Containers.Products.Api.Features.GetProductById;
+namespace Demo.Containers.Products.Api.Features.GetProductById.V1;
 
 public class GetProductByIdRequest : IRequest<Result<GetProductByIdResponse>>, IValidatable
 {
