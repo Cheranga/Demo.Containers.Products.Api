@@ -83,6 +83,11 @@ jobs:
         with:
           name: deploy
           path: deploy
+
+      - name: 'Login to Azure'
+        uses: azure/login@v1
+        with:
+          creds: ${{ inputs.credentials }}
             
       - name: Provision Resources 
         uses: azure/arm-deploy@v1
