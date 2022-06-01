@@ -1,5 +1,6 @@
 ﻿using Demo.Containers.Products.Api.Extensions;
 using Demo.Containers.Products.Api.Features.GetProductById;
+using Demo.Containers.Products.Api.Features.GetProductById.V1;
 using Demo.Containers.Products.Api.Infrastructure.DataAccess;
 using Demo.Containers.Products.Api.Shared;
 using FluentValidation;

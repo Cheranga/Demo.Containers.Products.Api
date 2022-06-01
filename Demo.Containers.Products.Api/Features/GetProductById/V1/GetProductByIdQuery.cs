@@ -3,7 +3,7 @@ using Demo.Containers.Products.Api.Shared;
 using FluentValidation;
 using MediatR;
 
-namespace Demo.Containers.Products.Api.Features.GetProductById;
+namespace Demo.Containers.Products.Api.Features.GetProductById.V1;
 
 public class GetProductByIdQuery : IValidatable, IQuery, IRequest<Result<ProductDataModel>>
 {

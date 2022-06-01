@@ -2,7 +2,7 @@ using System.Net;
 using Demo.Containers.Products.Api.Shared;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Demo.Containers.Products.Api.Features.GetProductById;
+namespace Demo.Containers.Products.Api.Features.GetProductById.V1;
 
 public class GetProductByIdResponse
 {
