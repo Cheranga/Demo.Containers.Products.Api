@@ -62,7 +62,7 @@ jobs:
     
     environment: 
       name: DEV
-      url: ${{ steps.deploywebapp.outputs.webapp-url }}      
+      # url: ${{ steps.deploywebapp.outputs.webapp-url }}      
       
     steps:      
       - name: Create Resource Group ${{ env.RG_NAME }}
