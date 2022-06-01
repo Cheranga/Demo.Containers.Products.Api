@@ -22,29 +22,12 @@ jobs:
     name: Build and Test
     runs-on: windows-latest    
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        
-      - name: Install .NET Core
-        uses: actions/setup-dotnet@v2
+      - name: Build Test Publish
+        uses: Cheranga/GitHubActions/buildtestpublish@master
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-          
-      - name: Restore projects
-        run: dotnet restore
-      
-      - name: Build Projects
-        run: dotnet build --no-restore -c Release
-      
-      - name: Publish
-        run: dotnet publish -c Release --no-build Demo.Containers.Products.Api/Demo.Containers.Products.Api.csproj -o api
-        
-      - name: Publish Artifact - API
-        uses: actions/upload-artifact@v3
-        with:
-          name: api
-          path: api/**
-          if-no-files-found: error
+          dotnetVersion: 6.0.x
+          projectName: Demo.Containers.Products.Api
+          artifactName: api
           
       - name: Publish Artifact - Templates
         uses: actions/upload-artifact@v3
