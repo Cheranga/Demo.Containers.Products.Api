@@ -53,15 +53,15 @@ jobs:
           path: ./.github/templates
           if-no-files-found: error
           
-  deploy-staging:
-    name: Deploy to Staging
+  DEV:
+    name: DEV
     needs: build
     runs-on: ubuntu-latest
     env:
       RG_NAME: rg-chera-demo-dev
     
     environment: 
-      name: PRE-PROD      
+      name: DEV
       url: ${{ steps.deploywebapp.outputs.webapp-url }}      
       
     steps:      
@@ -87,7 +87,7 @@ jobs:
       - name: 'Login to Azure'
         uses: azure/login@v1
         with:
-          creds: ${{ inputs.credentials }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
             
       - name: Provision Resources 
         uses: azure/arm-deploy@v1
@@ -115,38 +115,6 @@ jobs:
           slot-name: staging
           package: api 
           
-      # - name: Update config
-      #   uses: Azure/appservice-settings@v1
-      #   with:
-      #     app-name: api-${{ env.APP_NAME }}-dev
-      #     slot-name: staging
-      #     app-settings-json: |
-      #       [
-      #           {
-      #               "name": "DatabaseConfig:ConnectionString",
-      #               "value": "${{ secrets.DATABASECONNECTIONSTRING }}",
-      #               "slotSetting": true
-      #           }
-      #       ]
-      
-      - name: az cli logout
-        run: az logout  
-          
-  deploy_prod:
-    name: Swap to Production
-    needs: deploy-staging
-    runs-on: ubuntu-latest
-
-    environment:
-      name: PROD
-      url: ${{ steps.slot_swap.outputs.url }}
-
-    steps:
-      - name: Login via Azure CLI
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
       - name: Swap staging slot into production
         id: slot_swap
         run: |
@@ -172,5 +140,47 @@ jobs:
           az resource invoke-action --action stop --ids  /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}/providers/Microsoft.Web/sites/api-${{ env.APP_NAME }}-dev/slots/staging
 
       - name: az cli logout
-        run: az logout          
+        run: az logout    
+          
+  # deploy_prod:
+  #   name: Swap to Production
+  #   needs: deploy-staging
+  #   runs-on: ubuntu-latest
+
+  #   environment:
+  #     name: PROD
+  #     url: ${{ steps.slot_swap.outputs.url }}
+
+  #   steps:
+  #     - name: Login via Azure CLI
+  #       uses: azure/login@v1
+  #       with:
+  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+  #     - name: Swap staging slot into production
+  #       id: slot_swap
+  #       run: |
+  #         az webapp deployment slot swap -g ${{ env.RG_NAME }} -n api-${{ env.APP_NAME }}-dev -s staging
+  #         url=$(az webapp show -g ${{ env.RG_NAME }} -n api-${{ env.APP_NAME }}-dev --query "defaultHostName" -o tsv)
+  #         echo "::set-output name=url::https://$url"
+          
+  #     # - name: Update config
+  #     #   uses: Azure/appservice-settings@v1
+  #     #   with:
+  #     #     app-name: api-${{ env.APP_NAME }}-dev
+  #     #     app-settings-json: |
+  #     #       [
+  #     #           {
+  #     #               "name": "DatabaseConfig:ConnectionString",
+  #     #               "value": "${{ secrets.DATABASECONNECTIONSTRING }}",
+  #     #               "slotSetting": true
+  #     #           }
+  #     #       ]          
+      
+  #     - name: Stop Staging Slot
+  #       run: |
+  #         az resource invoke-action --action stop --ids  /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}/providers/Microsoft.Web/sites/api-${{ env.APP_NAME }}-dev/slots/staging
+
+  #     - name: az cli logout
+  #       run: az logout          
             
