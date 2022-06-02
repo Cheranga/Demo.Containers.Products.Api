@@ -85,25 +85,35 @@ jobs:
             apiName=${{ env.APP_NAME }}
             location=${{ env.RG_LOCATION }}
             databaseConnectionString="${{ secrets.DATABASECONNECTIONSTRING }}"
-            
-      - name: Start Staging Slot
-        run: |
-          az resource invoke-action --action start --ids  /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}/providers/Microsoft.Web/sites/api-${{ env.APP_NAME }}-dev/slots/staging            
-      
-      - name: Deploy web app
-        id: deploywebapp
-        uses: azure/webapps-deploy@v2
+
+      - name: Stage and Deploy
+        uses: Cheranga/GitHubActions/deploywebapp@master
         with:
-          app-name: api-${{ env.APP_NAME }}-dev
-          slot-name: staging
-          package: api 
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          resourceGroupName: ${{ env.RG_NAME }}
+          webAppArtifactName: api
+          webAppName: api-${{ env.APP_NAME }}-dev
+          location: ${{ env.RG_LOCATION }}            
+            
+      # - name: Start Staging Slot
+      #   run: |
+      #     az resource invoke-action --action start --ids  /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}/providers/Microsoft.Web/sites/api-${{ env.APP_NAME }}-dev/slots/staging            
+      
+      # - name: Deploy web app
+      #   id: deploywebapp
+      #   uses: azure/webapps-deploy@v2
+      #   with:
+      #     app-name: api-${{ env.APP_NAME }}-dev
+      #     slot-name: staging
+      #     package: api 
           
-      - name: Swap staging slot into production
-        id: slot_swap
-        run: |
-          az webapp deployment slot swap -g ${{ env.RG_NAME }} -n api-${{ env.APP_NAME }}-dev -s staging
-          url=$(az webapp show -g ${{ env.RG_NAME }} -n api-${{ env.APP_NAME }}-dev --query "defaultHostName" -o tsv)
-          echo "::set-output name=url::https://$url"
+      # - name: Swap staging slot into production
+      #   id: slot_swap
+      #   run: |
+      #     az webapp deployment slot swap -g ${{ env.RG_NAME }} -n api-${{ env.APP_NAME }}-dev -s staging
+      #     url=$(az webapp show -g ${{ env.RG_NAME }} -n api-${{ env.APP_NAME }}-dev --query "defaultHostName" -o tsv)
+      #     echo "::set-output name=url::https://$url"
           
       # - name: Update config
       #   uses: Azure/appservice-settings@v1
@@ -118,12 +128,12 @@ jobs:
       #           }
       #       ]          
       
-      - name: Stop Staging Slot
-        run: |
-          az resource invoke-action --action stop --ids  /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}/providers/Microsoft.Web/sites/api-${{ env.APP_NAME }}-dev/slots/staging
+      # - name: Stop Staging Slot
+      #   run: |
+      #     az resource invoke-action --action stop --ids  /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}/providers/Microsoft.Web/sites/api-${{ env.APP_NAME }}-dev/slots/staging
 
-      - name: az cli logout
-        run: az logout    
+      # - name: az cli logout
+      #   run: az logout    
           
   # deploy_prod:
   #   name: Swap to Production
