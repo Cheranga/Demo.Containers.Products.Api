@@ -20,78 +20,29 @@ jobs:
     name: Build and Test
     runs-on: windows-latest    
     steps:
-      - name: Build Test Publish
-        uses: Cheranga/GitHubActions/buildtestpublish@master
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v2
         with:
-          dotnetVersion: 6.0.x
-          projectName: Demo.Containers.Products.Api
-          artifactName: api
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Restore projects
+        run: dotnet restore
+      - name: Build Projects      
+        run: dotnet build --no-restore -c Release                
           
-      - name: Publish Artifact - Templates
-        uses: actions/upload-artifact@v3
-        with:
-          name: deploy
-          path: ./.github/templates
-          if-no-files-found: error
-          
-  DEV:
-    name: DEV
-    needs: build
-    runs-on: ubuntu-latest
-    env:
-      RG_NAME: rg-chera-demo-dev
-    
-    environment: 
-      name: DEV
-      
-    steps:      
-      - name: Create Resource Group ${{ env.RG_NAME }}
-        uses: Cheranga/GitHubActions/createresourcegroup@master
-        with:
-          credentials: ${{ secrets.AZURE_CREDENTIALS }}
-          name: ${{ env.RG_NAME }}
-          location: ${{ env.RG_LOCATION }}
-
-      - name: Download API
-        uses: actions/download-artifact@v3
-        with:
-          name: api
-          path: api
-          
-      - name: Download Templates
-        uses: actions/download-artifact@v3
-        with:
-          name: deploy
-          path: deploy
-
-      - name: 'Login to Azure'
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-            
-      - name: Provision Resources 
-        uses: azure/arm-deploy@v1
-        with:
-          failOnStdErr: false
-          deploymentName: ProductsAPI
-          resourceGroupName: ${{ env.RG_NAME }}
-          template: deploy/main.bicep
-          parameters: >            
-            envName=dev
-            apiEnvironment=Development
-            apiName=${{ env.APP_NAME }}
-            location=${{ env.RG_LOCATION }}
-            databaseConnectionString="${{ secrets.DATABASECONNECTIONSTRING }}"
-
-      - name: Stage and Deploy
-        uses: Cheranga/GitHubActions/deploywebapp@master
-        with:
-          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          credentials: ${{ secrets.AZURE_CREDENTIALS }}
-          resourceGroupName: ${{ env.RG_NAME }}
-          webAppArtifactName: api
-          webAppName: api-${{ env.APP_NAME }}-dev
-          location: ${{ env.RG_LOCATION }}            
+      - name: Login to Docker
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run:  |
+          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+      - name: Build Docker Image
+        run: |
+          docker build -t ${{secrets.DOCKER_USER}}/demoproductsapi:$(date +%s) --file Demo.Containers/Demo.Containers.Products.Api/Dockerfile
+      - name: Push to Docker
+        run: |
+          docker push ${{secrets.DOCKER_USER}}/demoproductsapi:$(date +%s)
             
            
             
