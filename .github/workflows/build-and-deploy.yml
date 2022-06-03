@@ -38,10 +38,10 @@ jobs:
           docker login -u ${{secrets.DOCKER_USER}} -p ${{secrets.DOCKER_PASSWORD}}
       - name: Build Docker Image
         run: |
-          docker build -t ${{secrets.DOCKER_USER}}/demoproductsapi:${{env.BUILD_VERSION}} --file Demo.Containers.Products.Api/Dockerfile .
+          docker build -t ${{secrets.DOCKER_USER}}/demoproductsapi --file Demo.Containers.Products.Api/Dockerfile .
       - name: Push to Docker
         run: |
-          docker push ${{secrets.DOCKER_USER}}/demoproductsapi:${{env.BUILD_VERSION}}
+          docker push ${{secrets.DOCKER_USER}}/demoproductsapi
             
            
             
