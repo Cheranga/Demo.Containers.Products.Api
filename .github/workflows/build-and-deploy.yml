@@ -51,7 +51,7 @@ jobs:
       - name: Generate Build Number
         id: generatebuildnumber
         run: |
-          echo "BUILD_VERSION=$(date +%Y%m%d%H%M)-${{ github.run_number }}" >> $GITHUB_ENV
+          echo "BUILD_VERSION=$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
       - name: Build Image and Publish
         uses: Cheranga/GitHubActions/buildandpushtodockerhub@master
         with:
@@ -70,45 +70,35 @@ jobs:
       - name: Login to Azure CLI       
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
-      # - name: Provision ACI
-      #   uses: Azure/aci-deploy@v1
-      #   with:
-      #     resource-group: ${{ env.RG_NAME }}-dev
-      #     dns-name-label: productsapidev
-      #     image: ${{ secrets.DOCKER_USER }}/demoproductsapi:${{env.BUILD_VERSION}}
-      #     name: ${{ env.APP_NAME }}-dev
-      #     command-line: /bin/bash a.sh
-      #     secure-environment-variables: DatabaseConfig__ConnectionString=${{ secrets.DATABASECONNECTIONSTRING }}
-      #     location: ${{ env.RG_LOCATION }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}        
 
-      # this works!
       # - name: Provision ACI
-      #   uses: azure/cli@v1
+      #   uses: azure/arm-deploy@v1        
       #   with:
-      #     inlineScript: |
-      #       az container create -g ${{ env.RG_NAME }}-dev \
-      #       --name ${{ env.APP_NAME }}dev \
-      #       --cpu 1 \
-      #       --memory 1 \
-      #       --ports 80 \
-      #       --dns-name-label ${{env.APP_NAME}}dev \
-      #       --image ${{ secrets.DOCKER_USER }}/demoproductsapi:${{env.BUILD_VERSION}} \
-      #       -e 'DatabaseConfigConnectionString'='${{ secrets.DATABASECONNECTIONSTRING }}'
+      #     failOnStdErr: false
+      #     deploymentName: ${{ env.BUILD_VERSION }}-aci
+      #     resourceGroupName: ${{ env.RG_NAME }}-dev
+      #     template: deploy/aci/template.bicep
+      #     parameters: >            
+      #       name=aci-${{ env.APP_NAME }}-dev            
+      #       dnsName=${{ env.APP_NAME }}-dev
+      #       location=${{ env.RG_LOCATION }}
+      #       image=cheranga/demoproductsapi:${{env.BUILD_VERSION}}
+      #       databaseConnectionString="${{ secrets.DATABASECONNECTIONSTRING }}"
 
-      - name: Provision ACI
+      - name: Provision Resources
         uses: azure/arm-deploy@v1        
         with:
           failOnStdErr: false
-          deploymentName: ${{ env.BUILD_VERSION }}-aci
+          deploymentName: ${{ env.BUILD_VERSION }}-${env.APP_NAME}
           resourceGroupName: ${{ env.RG_NAME }}-dev
-          template: deploy/aci/template.bicep
+          template: deploy/acimain.bicep
           parameters: >            
-            name=aci-${{ env.APP_NAME }}-dev            
-            dnsName=${{ env.APP_NAME }}-dev
+            buildNumber=${{ env.BUILD_VERSION }}
+            appName=${{ env.APP_NAME }}
+            environmentName=dev
             location=${{ env.RG_LOCATION }}
-            image=cheranga/demoproductsapi:${{env.BUILD_VERSION}}
+            containerImage=${{ secrets.DOCKER_USER }}/demoproductsapi:${{ env.BUILD_VERSION }}            
             databaseConnectionString="${{ secrets.DATABASECONNECTIONSTRING }}"
 
       - name: Logout from Azure CLI     

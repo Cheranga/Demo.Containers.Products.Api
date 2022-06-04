@@ -37,10 +37,20 @@ public class Bootstrapper
             }
             else
             {
+                builder.Services.AddApplicationInsightsTelemetry();
+                builder.Services.AddServiceProfiler(options =>
+                {
+                    options.Duration = TimeSpan.FromMinutes(1);
+                });
+                
                 configuration.MinimumLevel.Debug()
                     .WriteTo.ApplicationInsights(TelemetryConfiguration.CreateDefault(), TelemetryConverter.Traces, LogEventLevel.Debug);
+                
+                
             }
         });
+
+        
     }
 
     private static void RegisterConfigurations(IServiceCollection services, ConfigurationManager configurationManager)

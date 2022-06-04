@@ -30,6 +30,9 @@ param restartPolicy string = 'Always'
 @secure()
 param databaseConnectionString string
 
+@secure()
+param appInsightsKey string
+
 resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2021-09-01' = {
   name: name
   location: location
@@ -55,6 +58,10 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2021-09-01'
             {
               name: 'DatabaseConfigConnectionString'
               secureValue: databaseConnectionString
+            }
+            {
+              name: 'ApplicationInsights:InstrumentationKey'
+              secureValue: appInsightsKey
             }
           ]
         }
