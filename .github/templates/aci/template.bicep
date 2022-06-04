@@ -53,7 +53,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2021-09-01'
           }
           environmentVariables:[
             {
-              name: 'DatabaseConfig:ConnectionString'
+              name: 'DatabaseConfig__ConnectionString'
               secureValue: databaseConnectionString
             }
           ]
