@@ -32,6 +32,10 @@ jobs:
         run: dotnet restore
       - name: Build Projects      
         run: dotnet build --no-restore -c Release                
+      - name: Generate Build Number
+        id: generatebuildnumber
+        run: |
+          echo '::set-output name=BUILD_VERSION::$(date +%Y%m%d_%H%M%S)'
       - name: Build Image and Publish
         uses: Cheranga/GitHubActions/buildandpushtodockerhub@master
         with:
@@ -39,7 +43,7 @@ jobs:
           dockerPassword: ${{secrets.DOCKER_PASSWORD}}
           dockerFilePath: Demo.Containers.Products.Api/Dockerfile
           imageName: demoproductsapi
-          imageTag: ${{env.BUILD_VERSION}}
+          imageTag: ${{steps.generatebuildnumber.outputs.BUILD_VERSION}}
           
       # - name: Login to Docker
       #   run: |
