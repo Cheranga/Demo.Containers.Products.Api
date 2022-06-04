@@ -39,7 +39,7 @@ jobs:
           dockerPassword: ${{secrets.DOCKER_PASSWORD}}
           dockerFilePath: Demo.Containers.Products.Api/Dockerfile
           imageName: demoproductsapi
-          imageTag: $(date +%Y%m%d_%H%M%S)
+          imageTag: ${{env.BUILD_VERSION}}
           
       # - name: Login to Docker
       #   run: |
