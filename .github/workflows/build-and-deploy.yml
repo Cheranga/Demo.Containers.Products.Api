@@ -80,6 +80,7 @@ jobs:
           template: deploy/aci/template.bicep
           parameters: >            
             name=aci-${{ env.APP_NAME }}-dev            
+            dnsName=${{ env.APP_NAME }}-dev
             location=${{ env.RG_LOCATION }}
             image=cheranga/demoproductsapi:${{env.BUILD_VERSION}}
 

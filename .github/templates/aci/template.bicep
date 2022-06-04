@@ -1,6 +1,9 @@
 @description('Name for the container group')
 param name string
 
+@description('The DNS name')
+param dnsName string
+
 @description('Location for all resources.')
 param location string = resourceGroup().location
 
@@ -58,6 +61,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2021-09-01'
           protocol: 'TCP'
         }
       ]
+      dnsNameLabel:
     }
   }
 }
