@@ -19,8 +19,6 @@ jobs:
   build:
     name: Build and Test
     runs-on: ubuntu-latest
-    env:
-      BUILD_VERSION: $(date +%Y%m%d_%H%M%S)
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -35,7 +33,9 @@ jobs:
       - name: Generate Build Number
         id: generatebuildnumber
         run: |
-          echo "BUILD_VERSION=$(date +%Y%m%d_%H%M%S)"
+          echo ::set-env name=BUILD_VERSION::$(date +%Y%m%d_%H%M%S)
+          # echo "BUILD_VERSION=$(date +%Y%m%d_%H%M%S)"
+          # echo '::set-output name=BUILD_VERSION::$(date +%Y%m%d_%H%M%S)'
       - name: Build Image and Publish
         uses: Cheranga/GitHubActions/buildandpushtodockerhub@master
         with:
