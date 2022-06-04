@@ -81,7 +81,7 @@ jobs:
           parameters: >            
             name=aci-${{ env.APP_NAME }}-dev            
             location=${{ env.RG_LOCATION }}
-            image= ${{secrets.DOCKER_USER}}/demoproductsapi:${{env.BUILD_VERSION}}
+            image=cheranga/demoproductsapi:${{env.BUILD_VERSION}}
 
       - name: Logout from Azure CLI     
         uses: azure/CLI@v1
