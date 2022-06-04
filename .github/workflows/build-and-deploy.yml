@@ -75,7 +75,7 @@ jobs:
       - name: Provision ACI
         uses: Azure/aci-deploy@v1
         with:
-          resource-group: ${{ env.RG_NAME }}
+          resource-group: ${{ env.RG_NAME }}-dev
           dns-name-label: ${{ env.APP_NAME }}-dev
           image: cheranga/demoproductsapi:${{env.BUILD_VERSION}}
           name: productsapi
