@@ -28,15 +28,18 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       - name: Restore projects
         run: dotnet restore
+
       - name: Build Projects      
         run: dotnet build --no-restore -c Release                
+
+  deploytodev:
+    name: DEV
+    runs-on: ubuntu-latest
+    steps:
       - name: Generate Build Number
         id: generatebuildnumber
         run: |
-          echo "BUILD_VERSION=$(date +%Y%m%d_%H%M%S)" >> $GITHUB_ENV
-          # echo ::set-env name=BUILD_VERSION::$(date +%Y%m%d_%H%M%S)
-          # echo "BUILD_VERSION=$(date +%Y%m%d_%H%M%S)"
-          # echo '::set-output name=BUILD_VERSION::$(date +%Y%m%d_%H%M%S)'
+          echo "BUILD_VERSION=$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
       - name: Build Image and Publish
         uses: Cheranga/GitHubActions/buildandpushtodockerhub@master
         with:
@@ -45,16 +48,6 @@ jobs:
           dockerFilePath: Demo.Containers.Products.Api/Dockerfile
           imageName: demoproductsapi
           imageTag: ${{ env.BUILD_VERSION }}
-          
-      # - name: Login to Docker
-      #   run: |
-      #     docker login -u ${{secrets.DOCKER_USER}} -p ${{secrets.DOCKER_PASSWORD}}
-      # - name: Build Docker Image
-      #   run: |
-      #     docker build -t ${{secrets.DOCKER_USER}}/demoproductsapi --file Demo.Containers.Products.Api/Dockerfile .
-      # - name: Push to Docker
-      #   run: |
-      #     docker push ${{secrets.DOCKER_USER}}/demoproductsapi
             
            
             
