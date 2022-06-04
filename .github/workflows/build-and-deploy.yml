@@ -72,30 +72,32 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
         
-      - name: Provision ACI
-        uses: Azure/aci-deploy@v1
-        with:
-          resource-group: ${{ env.RG_NAME }}-dev
-          dns-name-label: productsapidev
-          image: ${{ secrets.DOCKER_USER }}/demoproductsapi:${{env.BUILD_VERSION}}
-          name: ${{ env.APP_NAME }}-dev
-          command-line: /bin/bash a.sh
-          secure-environment-variables: DatabaseConfig__ConnectionString=${{ secrets.DATABASECONNECTIONSTRING }}
-          location: ${{ env.RG_LOCATION }}
-      
       # - name: Provision ACI
-      #   uses: azure/arm-deploy@v1
+      #   uses: Azure/aci-deploy@v1
       #   with:
-      #     failOnStdErr: false
-      #     deploymentName: ACI-${{ env.BUILD_VERSION }}
-      #     resourceGroupName: ${{ env.RG_NAME }}-dev
-      #     template: deploy/aci/template.bicep
-      #     parameters: >            
-      #       name=aci-${{ env.APP_NAME }}-dev            
-      #       dnsName=${{ env.APP_NAME }}-dev
-      #       location=${{ env.RG_LOCATION }}
-      #       image=cheranga/demoproductsapi:${{env.BUILD_VERSION}}
-      #       databaseConnectionString=${{ secrets.DATABASECONNECTIONSTRING }}
+      #     resource-group: ${{ env.RG_NAME }}-dev
+      #     dns-name-label: productsapidev
+      #     image: ${{ secrets.DOCKER_USER }}/demoproductsapi:${{env.BUILD_VERSION}}
+      #     name: ${{ env.APP_NAME }}-dev
+      #     command-line: /bin/bash a.sh
+      #     secure-environment-variables: DatabaseConfig__ConnectionString=${{ secrets.DATABASECONNECTIONSTRING }}
+      #     location: ${{ env.RG_LOCATION }}
+      
+      - name: Provision ACI
+        uses: azure/arm-deploy@v1
+        env:
+          databaseConnectionString: "database connection string"
+        with:
+          failOnStdErr: false
+          deploymentName: ACI-${{ env.BUILD_VERSION }}
+          resourceGroupName: ${{ env.RG_NAME }}-dev
+          template: deploy/aci/template.bicep
+          parameters: >            
+            name=aci-${{ env.APP_NAME }}-dev            
+            dnsName=${{ env.APP_NAME }}-dev
+            location=${{ env.RG_LOCATION }}
+            image=cheranga/demoproductsapi:${{env.BUILD_VERSION}}
+            databaseConnectionString=${{ env.databaseConnectionString }}
 
       - name: Logout from Azure CLI     
         uses: azure/CLI@v1
