@@ -51,7 +51,7 @@ jobs:
       - name: Generate Build Number
         id: generatebuildnumber
         run: |
-          echo "BUILD_VERSION=$(date +%Y%m%d%H%M)-${{ github.run_id }}" >> $GITHUB_ENV
+          echo "BUILD_VERSION=$(date +%Y%m%d%H%M)-${{ github.run_number }}" >> $GITHUB_ENV
       - name: Build Image and Publish
         uses: Cheranga/GitHubActions/buildandpushtodockerhub@master
         with:
