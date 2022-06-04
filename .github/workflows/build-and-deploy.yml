@@ -76,8 +76,8 @@ jobs:
         uses: Azure/aci-deploy@v1
         with:
           resource-group: ${{ env.RG_NAME }}-dev
-          dns-name-label: productsapi
-          image: cheranga/demoproductsapi:${{env.BUILD_VERSION}}
+          dns-name-label: productsapidev
+          image: ${{ secrets.DOCKER_USER }}/demoproductsapi:${{env.BUILD_VERSION}}
           name: ${{ env.APP_NAME }}-dev
           command-line: /bin/bash a.sh
           secure-environment-variables: DatabaseConfig__ConnectionString=${{ secrets.DATABASECONNECTIONSTRING }}
