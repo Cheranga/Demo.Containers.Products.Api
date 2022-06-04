@@ -75,7 +75,7 @@ jobs:
         uses: azure/arm-deploy@v1
         with:
           failOnStdErr: false
-          deploymentName: ACI
+          deploymentName: ACI-${{ env.BUILD_VERSION }}
           resourceGroupName: ${{ env.RG_NAME }}-dev
           template: deploy/aci/template.bicep
           parameters: >            
