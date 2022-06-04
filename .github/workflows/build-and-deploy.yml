@@ -94,7 +94,7 @@ jobs:
             --ports 80 \
             --dns-name-label ${{env.APP_NAME}}dev \
             --image ${{ secrets.DOCKER_USER }}/demoproductsapi:${{env.BUILD_VERSION}} \
-            -e 'DatabaseConfig__ConnectionString'='blah'
+            -e 'DatabaseConfigConnectionString'='blah'
 
       # - name: Provision ACI
       #   uses: azure/arm-deploy@v1        
