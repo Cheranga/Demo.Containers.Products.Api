@@ -23,10 +23,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
       - name: Install .NET Core
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+
       - name: Restore projects
         run: dotnet restore
 
@@ -37,7 +39,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: deploy
-          path: ./github/templates
+          path: ./.github/templates
           if-no-files-found: error
 
   deploytodev:
