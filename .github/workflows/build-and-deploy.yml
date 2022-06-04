@@ -85,7 +85,7 @@ jobs:
 
       - name: Provision ACI
         run: |
-          az container create -g ${{ env.RG_NAME }} \
+          az container create -g ${{ env.RG_NAME }}-dev \
           --name ${{ env.APP_NAME }}dev \
           --cpu 1
           --memory 1
