@@ -35,7 +35,7 @@ jobs:
       - name: Generate Build Number
         id: generatebuildnumber
         run: |
-          echo '::set-output name=BUILD_VERSION::$(date +%Y%m%d_%H%M%S)'
+          echo "BUILD_VERSION=$(date +%Y%m%d_%H%M%S)"
       - name: Build Image and Publish
         uses: Cheranga/GitHubActions/buildandpushtodockerhub@master
         with:
@@ -43,7 +43,7 @@ jobs:
           dockerPassword: ${{secrets.DOCKER_PASSWORD}}
           dockerFilePath: Demo.Containers.Products.Api/Dockerfile
           imageName: demoproductsapi
-          imageTag: ${{steps.generatebuildnumber.outputs.BUILD_VERSION}}
+          imageTag: ${{env.BUILD_VERSION}}
           
       # - name: Login to Docker
       #   run: |
