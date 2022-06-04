@@ -76,7 +76,7 @@ jobs:
         with:
           failOnStdErr: false
           deploymentName: ACI
-          resourceGroupName: ${{ env.RG_NAME }}
+          resourceGroupName: ${{ env.RG_NAME }}-dev
           template: deploy/aci/template.bicep
           parameters: >            
             name=aci-${{ env.APP_NAME }}-dev            
