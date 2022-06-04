@@ -84,9 +84,7 @@ jobs:
       #     location: ${{ env.RG_LOCATION }}
       
       - name: Provision ACI
-        uses: azure/arm-deploy@v1
-        env:
-          databaseConnectionString: database connection string
+        uses: azure/arm-deploy@v1        
         with:
           failOnStdErr: false
           deploymentName: ACI-${{ env.BUILD_VERSION }}
@@ -97,7 +95,7 @@ jobs:
             dnsName=${{ env.APP_NAME }}-dev
             location=${{ env.RG_LOCATION }}
             image=cheranga/demoproductsapi:${{env.BUILD_VERSION}}
-            databaseConnectionString="${{ env.databaseConnectionString }}"
+            databaseConnectionString="${{ secrets.DATABASECONNECTIONSTRING }}"
 
       - name: Logout from Azure CLI     
         uses: azure/CLI@v1

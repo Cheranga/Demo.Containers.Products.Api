@@ -27,6 +27,7 @@ param memoryInGb int = 1
 ])
 param restartPolicy string = 'Always'
 
+@secure()
 param databaseConnectionString string
 
 resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2021-09-01' = {
