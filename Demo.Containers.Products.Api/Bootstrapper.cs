@@ -23,7 +23,7 @@ public class Bootstrapper
         RegisterConfigurations(services, configurationManager);
         RegisterResponseGenerators(services);
         RegisterBehaviours(services);
-        RegisterLogging(builder);
+        RegisterLogging(builder, configurationManager);
     }
 
     private static void RegisterLogging(WebApplicationBuilder builder, ConfigurationManager configurationManager)
