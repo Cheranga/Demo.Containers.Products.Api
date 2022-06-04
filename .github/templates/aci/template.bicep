@@ -60,7 +60,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2021-09-01'
               secureValue: databaseConnectionString
             }
             {
-              name: 'ApplicationInsights:InstrumentationKey'
+              name: 'ApplicationInsightsInstrumentationKey'
               secureValue: appInsightsKey
             }
           ]

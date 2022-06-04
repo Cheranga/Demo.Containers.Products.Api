@@ -26,7 +26,7 @@ public class Bootstrapper
         RegisterLogging(builder);
     }
 
-    private static void RegisterLogging(WebApplicationBuilder builder)
+    private static void RegisterLogging(WebApplicationBuilder builder, ConfigurationManager configurationManager)
     {
         builder.Host.UseSerilog((context, configuration) =>
         {
@@ -37,20 +37,14 @@ public class Bootstrapper
             }
             else
             {
-                builder.Services.AddApplicationInsightsTelemetry();
-                builder.Services.AddServiceProfiler(options =>
-                {
-                    options.Duration = TimeSpan.FromMinutes(1);
-                });
-                
+                var appInsightsKey = configurationManager["ApplicationInsightsInstrumentationKey"] ?? "";
+                builder.Services.AddApplicationInsightsTelemetry(appInsightsKey);
+                builder.Services.AddServiceProfiler();
+
                 configuration.MinimumLevel.Debug()
                     .WriteTo.ApplicationInsights(TelemetryConfiguration.CreateDefault(), TelemetryConverter.Traces, LogEventLevel.Debug);
-                
-                
             }
         });
-
-        
     }
 
     private static void RegisterConfigurations(IServiceCollection services, ConfigurationManager configurationManager)
