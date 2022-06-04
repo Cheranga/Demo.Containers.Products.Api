@@ -43,6 +43,7 @@ jobs:
           if-no-files-found: error
 
   deploytodev:
+    environment: DEV
     name: DEV
     needs: build
     runs-on: ubuntu-latest
@@ -83,6 +84,7 @@ jobs:
             dnsName=${{ env.APP_NAME }}-dev
             location=${{ env.RG_LOCATION }}
             image=cheranga/demoproductsapi:${{env.BUILD_VERSION}}
+            databaseConnectionString=${{ secrets.DATABASECONNECTIONSTRING }}
 
       - name: Logout from Azure CLI     
         uses: azure/CLI@v1

@@ -27,6 +27,9 @@ param memoryInGb int = 1
 ])
 param restartPolicy string = 'Always'
 
+@secure()
+param databaseConnectionString string
+
 resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2021-09-01' = {
   name: name
   location: location
@@ -48,8 +51,14 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2021-09-01'
               memoryInGB: memoryInGb
             }
           }
+          environmentVariables:[
+            {
+              name: 'DatabaseConfig:ConnectionString'
+              secureValue: databaseConnectionString
+            }
+          ]
         }
-      }
+      }      
     ]
     osType: 'Linux'
     restartPolicy: restartPolicy
@@ -62,7 +71,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2021-09-01'
         }
       ]
       dnsNameLabel: dnsName
-    }
+    }    
   }
 }
 
