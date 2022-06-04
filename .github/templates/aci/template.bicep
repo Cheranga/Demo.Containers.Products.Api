@@ -51,14 +51,14 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2021-09-01'
               memoryInGB: memoryInGb
             }
           }
-          environmentVariables:[
+          environmentVariables: [
             {
-              name:'DatabaseConfig__ConnectionString'
-              value:databaseConnectionString
+              name: 'DatabaseConfig__ConnectionString'
+              secureValue: databaseConnectionString
             }
           ]
         }
-      }      
+      }
     ]
     osType: 'Linux'
     restartPolicy: restartPolicy
@@ -71,7 +71,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2021-09-01'
         }
       ]
       dnsNameLabel: dnsName
-    }    
+    }
   }
 }
 
