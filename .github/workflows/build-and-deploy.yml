@@ -8,6 +8,7 @@ env:
   PUBLISHED_PATH: ./published
 
 on:
+
   pull_request:
     branches:
       - main
@@ -30,7 +31,14 @@ jobs:
         run: dotnet restore
 
       - name: Build Projects      
-        run: dotnet build --no-restore -c Release                
+        run: dotnet build --no-restore -c Release 
+
+      - name: Publish Artifacts - Deployment Templates
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy
+          path: ./github/templates
+          if-no-files-found: error
 
   deploytodev:
     name: DEV
@@ -49,6 +57,34 @@ jobs:
           dockerFilePath: Demo.Containers.Products.Api/Dockerfile
           imageName: demoproductsapi
           imageTag: ${{ env.BUILD_VERSION }}
-            
+
+      - name: Download Artifact - Templates
+        uses: actions/download-artifact@v3
+        with:
+          name: deploy
+          path: deploy
+
+      - name: Login to Azure CLI       
+        uses: azure/CLI@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Provision ACI
+        uses: azure/arm-deploy@v1
+        with:
+          failOnStdErr: false
+          deploymentName: ACI
+          resourceGroupName: ${{ env.RG_NAME }}
+          template: deploy/aci/template.bicep
+          parameters: >            
+            name=aci-${{ env.APP_NAME }}-dev            
+            location=${{ env.RG_LOCATION }}
+            image= ${{secrets.DOCKER_USER}}/demoproductsapi:${{env.BUILD_VERSION}}
+
+      - name: Logout from Azure CLI     
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az logout            
            
             
