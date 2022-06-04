@@ -23,10 +23,10 @@ public class Bootstrapper
         RegisterConfigurations(services, configurationManager);
         RegisterResponseGenerators(services);
         RegisterBehaviours(services);
-        RegisterLogging(builder);
+        RegisterLogging(builder, configurationManager);
     }
 
-    private static void RegisterLogging(WebApplicationBuilder builder)
+    private static void RegisterLogging(WebApplicationBuilder builder, ConfigurationManager configurationManager)
     {
         builder.Host.UseSerilog((context, configuration) =>
         {
@@ -37,6 +37,10 @@ public class Bootstrapper
             }
             else
             {
+                var appInsightsKey = configurationManager["ApplicationInsightsInstrumentationKey"] ?? "";
+                builder.Services.AddApplicationInsightsTelemetry(appInsightsKey);
+                builder.Services.AddServiceProfiler();
+
                 configuration.MinimumLevel.Debug()
                     .WriteTo.ApplicationInsights(TelemetryConfiguration.CreateDefault(), TelemetryConverter.Traces, LogEventLevel.Debug);
             }
@@ -45,7 +49,7 @@ public class Bootstrapper
 
     private static void RegisterConfigurations(IServiceCollection services, ConfigurationManager configurationManager)
     {
-        var connectionString = configurationManager["DatabaseConfig:ConnectionString"] ?? "";
+        var connectionString = configurationManager["DatabaseConfigConnectionString"] ?? "";
         services.AddSingleton(new DatabaseConfig
         {
             ConnectionString = connectionString
