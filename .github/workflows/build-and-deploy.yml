@@ -90,7 +90,7 @@ jobs:
         uses: azure/arm-deploy@v1        
         with:
           failOnStdErr: false
-          deploymentName: ${{ env.BUILD_VERSION }}-${env.APP_NAME}
+          deploymentName: ${{ env.BUILD_VERSION }}-${{ env.APP_NAME }}
           resourceGroupName: ${{ env.RG_NAME }}-dev
           template: deploy/acimain.bicep
           parameters: >            
