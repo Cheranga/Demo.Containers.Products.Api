@@ -34,7 +34,7 @@ module keyVault 'keyvault/template.bicep' = {
     secretData: {
       items: [
         {
-          name: 'databaseConnectionString'
+          name: 'DatabaseConfig--ConnectionString'
           value: databaseConnectionString
         }
         {
