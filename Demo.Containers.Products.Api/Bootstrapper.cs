@@ -1,4 +1,7 @@
-﻿using Demo.Containers.Products.Api.Extensions;
+﻿using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Demo.Containers.Products.Api.Extensions;
 using Demo.Containers.Products.Api.Features.GetProductById;
 using Demo.Containers.Products.Api.Features.GetProductById.V1;
 using Demo.Containers.Products.Api.Infrastructure.DataAccess;
@@ -20,6 +23,7 @@ public class Bootstrapper
         services.AddMediatR(typeof(Bootstrapper).Assembly);
         services.AddValidatorsFromAssembly(typeof(ModelValidatorBase<>).Assembly);
 
+        RegisterAzureClients(builder);
         RegisterConfigurations(services, configurationManager);
         RegisterResponseGenerators(services);
         RegisterBehaviours(services);
@@ -49,11 +53,11 @@ public class Bootstrapper
 
     private static void RegisterConfigurations(IServiceCollection services, ConfigurationManager configurationManager)
     {
-        var connectionString = configurationManager["DatabaseConfigConnectionString"] ?? "";
-        services.AddSingleton(new DatabaseConfig
-        {
-            ConnectionString = connectionString
-        });
+         services.AddScoped(_ =>
+         {
+             var databaseConfig = configurationManager.GetSection(nameof(DatabaseConfig)).Get<DatabaseConfig>();
+             return databaseConfig;
+         });
     }
 
     private static void RegisterBehaviours(IServiceCollection services)
@@ -65,5 +69,26 @@ public class Bootstrapper
     private static void RegisterResponseGenerators(IServiceCollection services)
     {
         services.AddScoped<IResponseGenerator<GetProductByIdResponse>, GetProductByIdResponseGenerator>();
+    }
+
+    private static void RegisterAzureClients(WebApplicationBuilder builder)
+    {
+        if (string.Equals("local", builder.Environment.EnvironmentName, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+        
+        var keyVaultName = builder.Configuration["KeyVaultName"];
+        var keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net/");
+
+        var secretClient = new SecretClient(keyVaultUri, new DefaultAzureCredential(new DefaultAzureCredentialOptions
+        {
+            ExcludeManagedIdentityCredential = false
+        }));
+
+        builder.Configuration.AddAzureKeyVault(secretClient, new AzureKeyVaultConfigurationOptions
+        {
+            ReloadInterval = TimeSpan.FromSeconds(30)
+        });
     }
 }
