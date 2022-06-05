@@ -71,7 +71,7 @@ jobs:
         uses: Cheranga/GitHubActions/createresourcegroup@master
         with:
           credentials: ${{ secrets.AZURE_CREDENTIALS }}
-          name: ${{ env.RG_NAME }}
+          name: ${{ env.RG_NAME }}-dev
           location: ${{ env.RG_LOCATION }}
 
       - name: Login to Azure CLI       
