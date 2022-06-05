@@ -66,6 +66,13 @@ jobs:
         with:
           name: deploy
           path: deploy
+      
+      - name: Create Resource Group - ${{ env.RG_NAME }}
+        uses: Cheranga/GitHubActions/createresourcegroup@master
+        with:
+          credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          name: ${ env.RG_NAME }
+          location: ${{ env.RG_LOCATION }}
 
       - name: Login to Azure CLI       
         uses: azure/login@v1
