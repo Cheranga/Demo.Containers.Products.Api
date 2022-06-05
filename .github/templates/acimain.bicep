@@ -38,7 +38,7 @@ module keyVault 'keyvault/template.bicep' = {
           value: databaseConnectionString
         }
         {
-          name: 'appInsightsKey'
+          name: 'ApplicationInsights--InstrumentationKey'
           value: appInsights.outputs.appInsightsKey
         }
       ]

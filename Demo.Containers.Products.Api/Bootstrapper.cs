@@ -41,8 +41,8 @@ public class Bootstrapper
             }
             else
             {
-                var appInsightsKey = configurationManager["ApplicationInsightsInstrumentationKey"] ?? "";
-                builder.Services.AddApplicationInsightsTelemetry(appInsightsKey);
+                // var appInsightsKey = configurationManager["ApplicationInsights:InstrumentationKey"] ?? "";
+                builder.Services.AddApplicationInsightsTelemetry();
                 builder.Services.AddServiceProfiler();
 
                 configuration.MinimumLevel.Debug()
