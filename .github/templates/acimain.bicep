@@ -9,7 +9,7 @@ param databaseConnectionString string
 
 var appInsightsName = 'ins-${appName}-${environmentName}'
 var aciName = 'aci-${appName}-${environmentName}'
-var kvName = 'kv-${appName}-${environmentName}'
+var kvName = 'kv-ccproductsapi-${environmentName}'
 
 module appInsights 'appinsights/template.bicep' = {
   name: '${buildNumber}-appinsights'
