@@ -34,7 +34,7 @@ public class Bootstrapper
     {
         builder.Host.UseSerilog((context, configuration) =>
         {
-            if (string.Equals("local", context.HostingEnvironment.EnvironmentName, StringComparison.OrdinalIgnoreCase))
+            if (context.HostingEnvironment.IsDevelopment())
             {
                 configuration.MinimumLevel.Debug()
                     .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}");
@@ -73,7 +73,7 @@ public class Bootstrapper
 
     private static void RegisterAzureClients(WebApplicationBuilder builder)
     {
-        if (string.Equals("local", builder.Environment.EnvironmentName, StringComparison.OrdinalIgnoreCase))
+        if (builder.Environment.IsDevelopment())
         {
             return;
         }
