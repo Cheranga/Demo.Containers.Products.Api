@@ -9,9 +9,9 @@ WORKDIR /src
 COPY . .
 RUN dotnet restore
 COPY . .
-RUN dotnet publish -c release -o /app
+RUN dotnet publish -c release -o /productsapi
 
 FROM base as final
-WORKDIR /app
-COPY --from=build /app .
+WORKDIR /productsapi
+COPY --from=build /productsapi .
 ENTRYPOINT ["dotnet", "Demo.Containers.Products.Api.dll"]

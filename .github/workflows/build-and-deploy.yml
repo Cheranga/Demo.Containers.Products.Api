@@ -8,6 +8,7 @@ env:
   PUBLISHED_PATH: ./published
 
 on:
+
   pull_request:
     branches:
       - main
@@ -18,80 +19,99 @@ on:
 jobs: 
   build:
     name: Build and Test
-    runs-on: windows-latest    
+    runs-on: ubuntu-latest
     steps:
-      - name: Build Test Publish
-        uses: Cheranga/GitHubActions/buildtestpublish@master
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v2
         with:
-          dotnetVersion: 6.0.x
-          projectName: Demo.Containers.Products.Api
-          artifactName: api
-          
-      - name: Publish Artifact - Templates
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore projects
+        run: dotnet restore
+
+      - name: Build Projects      
+        run: dotnet build --no-restore -c Release 
+
+      - name: Publish Artifacts - Deployment Templates
         uses: actions/upload-artifact@v3
         with:
           name: deploy
           path: ./.github/templates
           if-no-files-found: error
-          
-  DEV:
+
+  deploytodev:
+    environment: DEV
     name: DEV
     needs: build
     runs-on: ubuntu-latest
-    env:
-      RG_NAME: rg-chera-demo-dev
-    
-    environment: 
-      name: DEV
-      
-    steps:      
-      - name: Create Resource Group ${{ env.RG_NAME }}
-        uses: Cheranga/GitHubActions/createresourcegroup@master
+    steps:
+      - name: Generate Build Number
+        id: generatebuildnumber
+        run: |
+          echo "BUILD_VERSION=$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
+      - name: Build Image and Publish
+        uses: Cheranga/GitHubActions/buildandpushtodockerhub@master
         with:
-          credentials: ${{ secrets.AZURE_CREDENTIALS }}
-          name: ${{ env.RG_NAME }}
-          location: ${{ env.RG_LOCATION }}
+          dockerUserName: ${{secrets.DOCKER_USER}}
+          dockerPassword: ${{secrets.DOCKER_PASSWORD}}
+          dockerFilePath: Demo.Containers.Products.Api/Dockerfile
+          imageName: demoproductsapi
+          imageTag: ${{ env.BUILD_VERSION }}
 
-      - name: Download API
-        uses: actions/download-artifact@v3
-        with:
-          name: api
-          path: api
-          
-      - name: Download Templates
+      - name: Download Artifact - Templates
         uses: actions/download-artifact@v3
         with:
           name: deploy
           path: deploy
+      
+      - name: Create Resource Group - ${{ env.RG_NAME }}
+        uses: Cheranga/GitHubActions/createresourcegroup@master
+        with:
+          credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          name: ${{ env.RG_NAME }}-dev
+          location: ${{ env.RG_LOCATION }}
 
-      - name: 'Login to Azure'
+      - name: Login to Azure CLI       
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-            
-      - name: Provision Resources 
-        uses: azure/arm-deploy@v1
+          creds: ${{ secrets.AZURE_CREDENTIALS }}        
+
+      # - name: Provision ACI
+      #   uses: azure/arm-deploy@v1        
+      #   with:
+      #     failOnStdErr: false
+      #     deploymentName: ${{ env.BUILD_VERSION }}-aci
+      #     resourceGroupName: ${{ env.RG_NAME }}-dev
+      #     template: deploy/aci/template.bicep
+      #     parameters: >            
+      #       name=aci-${{ env.APP_NAME }}-dev            
+      #       dnsName=${{ env.APP_NAME }}-dev
+      #       location=${{ env.RG_LOCATION }}
+      #       image=cheranga/demoproductsapi:${{env.BUILD_VERSION}}
+      #       databaseConnectionString="${{ secrets.DATABASECONNECTIONSTRING }}"
+
+      - name: Provision Resources
+        uses: azure/arm-deploy@v1        
         with:
           failOnStdErr: false
-          deploymentName: ProductsAPI
-          resourceGroupName: ${{ env.RG_NAME }}
-          template: deploy/main.bicep
+          deploymentName: ${{ env.BUILD_VERSION }}-${{ env.APP_NAME }}
+          resourceGroupName: ${{ env.RG_NAME }}-dev
+          template: deploy/acimain.bicep
           parameters: >            
-            envName=dev
-            apiEnvironment=Development
-            apiName=${{ env.APP_NAME }}
+            buildNumber=${{ env.BUILD_VERSION }}
+            appName=${{ env.APP_NAME }}
+            environmentName=dev
             location=${{ env.RG_LOCATION }}
+            containerImage=${{ secrets.DOCKER_USER }}/demoproductsapi:${{ env.BUILD_VERSION }}            
             databaseConnectionString="${{ secrets.DATABASECONNECTIONSTRING }}"
 
-      - name: Stage and Deploy
-        uses: Cheranga/GitHubActions/deploywebapp@master
+      - name: Logout from Azure CLI     
+        uses: azure/CLI@v1
         with:
-          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          credentials: ${{ secrets.AZURE_CREDENTIALS }}
-          resourceGroupName: ${{ env.RG_NAME }}
-          webAppArtifactName: api
-          webAppName: api-${{ env.APP_NAME }}-dev
-          location: ${{ env.RG_LOCATION }}            
-            
+          inlineScript: |
+            az logout            
            
             
