@@ -35,8 +35,18 @@ module keyVault 'keyvault/template.bicep' = {
   params: {
     location: location
     kvName: keyVaultName
-    productionSlotId: productAPI.outputs.ProductionObjectId
-    stagingSlotId: productAPI.outputs.StagingObjectId
+    // productionSlotId: productAPI.outputs.ProductionObjectId
+    // stagingSlotId: productAPI.outputs.StagingObjectId
+    readers: {
+      items: [
+        {
+          managedId: productAPI.outputs.ProductionObjectId
+        }
+        {
+          managedId: productAPI.outputs.StagingObjectId
+        }
+      ]
+    }
     secretData: {
       items: [
         {

@@ -25,17 +25,19 @@ param memoryInGb int = 1
   'Never'
   'OnFailure'
 ])
-param restartPolicy string = 'Always'
-
-@secure()
-param databaseConnectionString string
+param restartPolicy string = 'OnFailure'
 
 @secure()
 param appInsightsKey string
 
+param keyVaultName string
+
 resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2021-09-01' = {
   name: name
   location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     containers: [
       {
@@ -56,12 +58,12 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2021-09-01'
           }
           environmentVariables: [
             {
-              name: 'DatabaseConfigConnectionString'
-              secureValue: databaseConnectionString
-            }
-            {
               name: 'ApplicationInsightsInstrumentationKey'
               secureValue: appInsightsKey
+            }
+            {
+              name: 'KeyVaultName'
+              value: keyVaultName
             }
           ]
         }
@@ -83,3 +85,4 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2021-09-01'
 }
 
 output containerIPv4Address string = containerGroup.properties.ipAddress.ip
+output managedId string = containerGroup.identity.principalId

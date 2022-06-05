@@ -9,6 +9,7 @@ param databaseConnectionString string
 
 var appInsightsName = 'ins-${appName}-${environmentName}'
 var aciName = 'aci-${appName}-${environmentName}'
+var kvName = 'kv-${appName}-${environmentName}'
 
 module appInsights 'appinsights/template.bicep' = {
   name: '${buildNumber}-appinsights'
@@ -18,6 +19,38 @@ module appInsights 'appinsights/template.bicep' = {
   }
 }
 
+module keyVault 'keyvault/template.bicep' = {
+  name: '${buildNumber}-key-vault'  
+  params: {
+    location:location
+    kvName: kvName
+    readers: {
+      items:[
+        {
+          managedId: containerInstance.outputs.managedId
+        }
+      ]
+    }
+    secretData: {
+      items: [
+        {
+          name: 'databaseConnectionString'
+          value: databaseConnectionString
+        }
+        {
+          name: 'appInsightsKey'
+          value: appInsights.outputs.appInsightsKey
+        }
+      ]
+    }
+  }
+  dependsOn:[
+    appInsights
+    containerInstance
+  ]
+}
+
+
 module containerInstance 'aci/template.bicep' = {
   name: '${buildNumber}-container-instance'
   params: {
@@ -25,7 +58,7 @@ module containerInstance 'aci/template.bicep' = {
     name: aciName
     dnsName: '${appName}-${environmentName}'
     image: containerImage
-    databaseConnectionString: databaseConnectionString
+    keyVaultName: kvName
     appInsightsKey: appInsights.outputs.appInsightsKey
   }
   dependsOn: [
