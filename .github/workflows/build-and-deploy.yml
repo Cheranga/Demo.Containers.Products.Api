@@ -98,7 +98,8 @@ jobs:
             appName=${{ env.APP_NAME }}
             environmentName=dev
             location=${{ env.RG_LOCATION }}
-            containerImage=${{ secrets.DOCKER_USER }}/demoproductsapi:${{ env.BUILD_VERSION }}
+            containerImage=${{ secrets.DOCKER_USER }}/demoproductsapi:${{ env.BUILD_VERSION }}            
+            databaseConnectionString="${{ secrets.DATABASECONNECTIONSTRING }}"
 
       - name: Logout from Azure CLI     
         uses: azure/CLI@v1
